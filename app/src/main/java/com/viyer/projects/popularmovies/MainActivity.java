@@ -4,6 +4,7 @@ package com.viyer.projects.popularmovies;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
@@ -27,7 +28,7 @@ import java.net.URL;
 
 
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler, FetchMoviesCallback{
 
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
@@ -36,44 +37,33 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
 
     @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movie);
-
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-
-        mRecyclerView.setLayoutManager(gridLayoutManager);
-
-
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        }
+        else{
+            mRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        }
         mMovieAdapter = new MovieAdapter(this);
-
         mRecyclerView.setAdapter(mMovieAdapter);
-
         mLoadingIndicator = (ProgressBar) findViewById(R.id.movie_loading_indicator);
-
-    loadMovies(R.id.action_sortbyMostPopular);
+        loadMovies(R.id.action_sortbyMostPopular);
 
     }
-
-
-
 
     private void showMoviesDataView() {
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
-
     private void showErrorMessage() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
-
-
-
 
 
     @Override
@@ -86,16 +76,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
             loadMovies(Integer.valueOf(id));
             return true;
-
-   }
+     }
 
 
     private void loadMovies(Integer sortBy) {
         if (isOnline())  {
-            new FetchMoviesTask().execute(sortBy);
+            String apiKey = getApplicationContext().getString(R.string.api_key);
+            new FetchMoviesTask().execute(sortBy, apiKey, this);
         }
         else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -122,9 +111,27 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             alert.show();
 
         }
-
-
     }
+
+    /*
+        methods implementing FetchMoviesCallback
+     */
+    @Override
+    public void onFetchMoviesCallback(Movie[] movieData) {
+        if (movieData != null) {
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
+            showMoviesDataView();
+            mMovieAdapter.setWeatherData(movieData);
+        } else {
+            showErrorMessage();
+        }
+    }
+
+    @Override
+    public void onPreExecuteFetchMovies() {
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+    }
+
 
     public boolean isOnline() {
         ConnectivityManager cm =
@@ -134,68 +141,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
-
-    public class FetchMoviesTask extends AsyncTask<Integer, Void, Movie[]> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-
-        }
-
-        @Override
-        protected Movie[] doInBackground(Integer... params) {
-            Integer sortBy = params[0];
-
-            try {
-                URL moviesUrl= null;
-                String apiKey = getApplicationContext().getString(R.string.api_key);
-                if (sortBy == R.id.action_sortbyMostPopular) {
-                   moviesUrl = NetworkUtils.buildUrl("popular", apiKey);
-                }
-                else if (sortBy == R.id.action_sortbyTopRated) {
-                   moviesUrl = NetworkUtils.buildUrl("top_rated", apiKey);
-                }
-
-                String jsonResponse = NetworkUtils
-                        .getResponseFromHttpUrl(moviesUrl);
-
-                Movie[] movieData = MovieJSONUtils.getPopularMoviesFromJson(
-                      MainActivity.this, jsonResponse);
-
-                return movieData;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Movie[] movieData) {
-
-           if (movieData != null) {
-                    mLoadingIndicator.setVisibility(View.INVISIBLE);
-                    showMoviesDataView();
-                    mMovieAdapter.setWeatherData(movieData);
-                } else {
-                    showErrorMessage();
-                }
-
-
-
-            }
-
-
-    }
-
-
-
     @Override
     public void onClick(Movie movie) {
-        Intent intent = new Intent(this,
-                DetailActivity.class);
+         Intent intent = new Intent(this, DetailActivity.class);
          intent.putExtra(Movie.MOVIE, movie);
-        startActivity(intent);
+         startActivity(intent);
     }
 }

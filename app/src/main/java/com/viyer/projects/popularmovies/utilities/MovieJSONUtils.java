@@ -1,26 +1,20 @@
 package com.viyer.projects.popularmovies.utilities;
 
+import com.viyer.projects.popularmovies.Movie;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-
-    import android.content.Context;
-
-    import com.viyer.projects.popularmovies.Movie;
-
-    import org.json.JSONArray;
-    import org.json.JSONException;
-    import org.json.JSONObject;
-
-    import java.net.HttpURLConnection;
-    import java.sql.Date;
+import java.net.HttpURLConnection;
+import java.sql.Date;
 
 /**
      * Utility functions to handle MovieDatabase JSON data.
      */
     public final class MovieJSONUtils {
 
-
-        public static Movie[] getPopularMoviesFromJson(Context context, String movieJsonStr)
+        public static Movie[] getPopularMoviesFromJson(String movieJsonStr)
                 throws JSONException {
 
              final String RESULTS = "results";
@@ -30,17 +24,11 @@ package com.viyer.projects.popularmovies.utilities;
             final String POSTER_PATH = "poster_path";
             final String VOTE_AVERAGE = "vote_average";
             final String RELEASE_DATE = "release_date";
+           final String MESSAGE_CODE = "cod";
 
-
-            final String MESSAGE_CODE = "cod";
-
-
-            JSONObject movieJson = new JSONObject(movieJsonStr);
-
-
-            if (movieJson.has(MESSAGE_CODE)) {
+           JSONObject movieJson = new JSONObject(movieJsonStr);
+           if (movieJson.has(MESSAGE_CODE)) {
                 int errorCode = movieJson.getInt(MESSAGE_CODE);
-
                 switch (errorCode) {
                     case HttpURLConnection.HTTP_OK:
                         break;
@@ -64,16 +52,13 @@ package com.viyer.projects.popularmovies.utilities;
                 String rating  = movieJSONObject.getString(VOTE_AVERAGE) + "/10";
                 String releaseDate = movieJSONObject.getString(RELEASE_DATE);
 
-               movie.setTitle(title);
+                movie.setTitle(title);
                 movie.setPosterUrl(posterURL);
                 movie.setOverview(movieJSONObject.getString(OVERVIEW));
                 movie.setRating(rating);
                 movie.setReleaseDate(Date.valueOf(releaseDate));
                 parsedMovieData[i] = movie;
             }
-
-          return parsedMovieData;
+         return parsedMovieData;
         }
-
-
-    }
+   }

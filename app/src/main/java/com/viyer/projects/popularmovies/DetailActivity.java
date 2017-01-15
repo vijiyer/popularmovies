@@ -10,6 +10,8 @@ import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 
+import butterknife.ButterKnife;
+
 public class DetailActivity extends AppCompatActivity {
 
     @Override
@@ -20,20 +22,21 @@ public class DetailActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        Movie movie = (Movie)getIntent().getSerializableExtra(Movie.MOVIE);
-
-        TextView releaseDate = (TextView) findViewById(R.id.releaseDate);
-        TextView title = (TextView) findViewById(R.id.original_title);
-        TextView rating = (TextView) findViewById(R.id.rating);
-        TextView synopsis = (TextView) findViewById(R.id.synopsis);
-        ImageView posterView = (ImageView) findViewById(R.id.poster);
+        Movie movie = getIntent().getParcelableExtra(Movie.MOVIE);
+        TextView releaseDate = ButterKnife.findById(this, R.id.releaseDate);
+        TextView title = ButterKnife.findById(this,R.id.original_title);
+        TextView rating = ButterKnife.findById(this,R.id.rating);
+        TextView synopsis = ButterKnife.findById(this,R.id.synopsis);
+        ImageView posterView = ButterKnife.findById(this, R.id.poster);
         if (movie != null) {
             title.setText(movie.getTitle());
             releaseDate.setText(new SimpleDateFormat("yyyy").format(movie.getReleaseDate()));
             rating.setText(movie.getRating());
             synopsis.setText(movie.getOverview());
             Picasso.with(this)
-                    .load(movie.getPosterUrl()).into(posterView);
+                    .load(movie.getPosterUrl())
+                    .placeholder(R.color.colorPrimaryDark)
+                    .error(R.color.colorAccent).into(posterView);
         }
 
     }
