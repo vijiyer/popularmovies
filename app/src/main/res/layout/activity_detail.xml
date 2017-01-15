@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <TextView
+        android:text="title of movie"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/original_title"
+        android:layout_weight="0.25"
+        android:gravity="center_vertical"
+
+        android:contentDescription="title"
+        android:background="@color/colorPrimaryDark"
+        android:textColor="@android:color/background_light"
+        android:textSize="32sp"
+        android:padding="16dp"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.30"
+        >
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.40"
+            app:srcCompat="@android:drawable/ic_input_add"
+            android:id="@+id/poster"
+            />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_weight="0.60"
+            android:layout_width="0dp"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="release date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textSize="20sp"
+                android:textColor="@android:color/black"
+                android:id="@+id/releaseDate" />
+
+            <TextView
+                android:text="Rating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:padding="5dp"
+                android:textColor="@android:color/black"
+                android:id="@+id/rating" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:text="Synopsis"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/synopsis"
+        android:padding="20dp"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:layout_weight="0.45" />
+</LinearLayout>
